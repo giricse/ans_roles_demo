@@ -1,0 +1,6 @@
+---
+- name: Roles playbook
+  hosts: tag_Name_slave
+  roles:
+  - jmwt
+
