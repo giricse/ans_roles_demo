@@ -1,0 +1,47 @@
+---
+-  name: check web derver dir
+   stat:
+     path: /usr/share/httpd
+   register: web_dir
+
+-  name: display details
+   debug:
+     var: web_dir
+
+-  name: Web server installed
+   debug:
+     msg: web server installed. skip installing in next task
+   when: web_dir.stat.exists == true
+
+-  name: Web server NOT installed
+   debug:
+     msg: Web server is NOT installed. Install in next task
+   when: web_dir.stat.exists == false
+
+-  name: install web server
+   yum:
+     name: httpd
+     state: installed
+   when: web_dir.stat.exists == false
+
+-  name: check again web server dir
+   stat:
+     path: /usr/share/httpd
+   register: web_dir
+
+-  name: start web server
+   service:
+     name: httpd
+     state: started
+   when: web_dir.stat.exists == true
+
+-  name: change default page
+   copy:
+     src: files/index.html
+     dest: /usr/share/httpd/noindex/
+     mode: 0777
+     owner: root
+     group: root
+   when: web_dir.stat.exists == true
+
+

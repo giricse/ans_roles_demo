@@ -1,0 +1,25 @@
+---
+-  name: check java version
+   shell: java -version 2>&1 | grep version | awk '{print $3}' | sed 's/"//g'
+   register: java_version
+
+-  name: display version details
+   debug:
+     var: java_version
+
+-  name: Java Installed Message
+   debug: 
+     msg: java is installed. skip java installation in next task
+   when: java_version.stdout != ""
+
+-  name: Java Not Installed
+   debug:
+     msg: Java is NOT installed. Install in next task
+   when: java_version.stdout == ""
+
+-  name: Java Install
+   yum:
+     name: "{{ java_package }}"
+     state: installed
+   when: java_version.stdout == ""
+

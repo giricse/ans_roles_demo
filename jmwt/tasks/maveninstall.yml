@@ -1,0 +1,25 @@
+---
+-  name: check Maven version
+   shell: mvn --version 2>&1 | grep version | awk '{print $3}' | sed 's/"//g'
+   register: mvn_version
+
+-  name: display version details
+   debug:
+     var: mvn_version
+
+-  name: Maven Installed Message
+   debug: 
+     msg: Maven is installed. skip Maven installation in next task
+   when: mvn_version.stdout != ""
+
+-  name: Maven Not Installed
+   debug:
+     msg: maven is NOT installed. Install in next task
+   when: mvn_version.stdout == ""
+
+-  name: Maven Install
+   yum:
+     name: "{{ maven_package }}"
+     state: installed
+   when: mvn_version.stdout == ""
+

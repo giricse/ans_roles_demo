@@ -1,0 +1,73 @@
+---
+-  name: check tomcat derver dir
+   stat:
+     path: /usr/share/tomcat
+   register: tomcat_dir
+
+-  name: display details
+   debug:
+     var: tomcat_dir
+
+-  name: Tomcat server installed
+   debug:
+     msg: tomcat server installed. skip installing in next task
+   when: tomcat_dir.stat.exists == true
+
+-  name: tomcat server NOT installed
+   debug:
+     msg: tomcat server is NOT installed. Install in next task
+   when: tomcat_dir.stat.exists == false
+
+-  name: install tomcat server
+   yum:
+     name: tomcat
+     state: installed
+   when: tomcat_dir.stat.exists == false
+
+-  name: check again tomcat server dir
+   stat:
+     path: /usr/share/tomcat
+   register: tomcat_dir
+
+-  name: start tomcat server
+   service:
+     name: tomcat
+     state: started
+   when: tomcat_dir.stat.exists == true
+
+-  name: check ROOT dir
+   stat:
+     path: /usr/share/tomcat/webapps/ROOT
+   register: root_dir
+
+-  name: create ROOT dir
+   file:
+     path: /usr/share/tomcat/webapps/ROOT/
+     state: directory
+     mode: 0777
+     owner: root
+     group: root
+
+-  name: check ROOT dir
+   stat:
+     path: /usr/share/tomcat/webapps/ROOT
+   register: root_dir
+
+-  name: change default page
+   copy:
+     src: files/index.html
+     dest: /usr/share/tomcat/webapps/ROOT/
+     mode: 0777
+     owner: root
+     group: root
+   when: root_dir.stat.exists == true
+
+-  name: deploy sample file
+   copy:
+     src: files/sample.war
+     dest: /usr/share/tomcat/webapps
+     mode: 0777
+     owner: root
+     group: root
+      
+

@@ -1,0 +1,6 @@
+---
+# vars file for jmwt
+
+
+java_package: java
+maven_package: maven
